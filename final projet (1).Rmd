@@ -1,0 +1,185 @@
+---
+title: "Final Project"
+author: "Dan Kalenga"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+
+library(tidyverse)
+library(openintro)
+library(readr)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rnaturalearthhires)
+library(shiny)
+library(plotly)
+
+
+```
+### Exercise 1
+
+```{r code-chunk-label}
+
+education <- read_csv("share-of-education-in-government-expenditure.csv") |>
+  rename( country = Entity, edu_share = `Government expenditure on education, total (% of government expenditure)`
+  )
+
+unemployment <- read_csv("unemployment-rate.csv") |>
+  rename(rate = `Unemployment, total (% of total labor force) (modeled ILO estimate)` 
+         )
+education <- education |>
+  mutate(country = case_when(
+    country == "United States" ~ "United States of America",
+    country == "Congo" ~ "Republic of the Congo",
+    country == "Democratic Republic of Congo" ~ "Democratic Republic of the Congo",
+    country == "DR Congo" ~ "Democratic Republic of the Congo",
+    country == "Tanzania" ~ "United Republic of Tanzania",
+    country == "Russia" ~ "Russian Federation",
+    country == "Vietnam" ~ "Viet Nam",
+    country == "Iran" ~ "Iran, Islamic Republic of",
+    country == "Syria" ~ "Syrian Arab Republic",
+    country == "Bolivia" ~ "Bolivia ( Plurinational State of)",
+    country == "Venezuela" ~ "Venezuela (Bolivarian Republic of )",
+    country == "Egypt" ~ "Egypt, Arab Rep.",
+      country == "Gambia" ~ "Gambia, The",
+    TRUE ~ country
+  ))
+
+world <- ne_countries(scale = "medium", returnclass = "sf")   |>
+  mutate(name = case_when(
+    name == "United States" ~ "United States of America",
+    name == "Republic of Congo" ~ "Republic of the Congo",
+    name == "Democratic Republic of the Congo" ~ "Democratic Republic of the Congo",
+    name == "Tanzania" ~ "United Republic of Tanzania",
+    name == "Russia" ~ "Russian Federation",
+    name == "Vietnam" ~ "Viet Nam",
+    name == "Iran" ~ "Iran, Islamic Republic of",
+    name == "Syria" ~ "Syrian Arab Republic",
+    name == "Bolivia" ~ "Bolivia (Plurinational State of)",
+    name == "Venezuela" ~ "Venezuela (Bolivarian Republic of)",
+    name == "Egypt" ~ "Egypt, Arab Rep.",
+    name == "The Gambia" ~ "Gambia, The",
+    TRUE ~ name
+  ))
+edu_years <- sort(unique(education$Year))
+unemp_years <- sort(unique(unemployment$Year))
+my_cutpoints <- c(0, 5, 10, 15, 20, 25, 30)
+my_colors <- c("#f7fcd0", "#dff2b4", "#b8e186", "#7fbc41", "#4d9221", "#276419")
+ui <- fluidPage(
+  titlePanel("Global Education & Unemployment Dashboard"),
+  tags$hr(),
+  tabsetPanel(
+  tabPanel( "Education Map",
+      sidebarLayout(
+        sidebarPanel(
+          sliderInput("map_year","Select Year:",
+            min = min(edu_years),
+            max = max(edu_years),
+            value = max(edu_years),
+            step = 1,
+            sep = ""),
+          p("World choropleth map of government expenditure on education as % of total government spending.")),
+mainPanel( h3("Education spending as % of government expenditure"),
+          plotlyOutput("mymap", height = "520px"),
+          tags$br(),
+          img(src = "legend.png", width = "100%", height = "70px")
+        ) ) ) ,
+    tabPanel( "Unemployment Lines",
+      sidebarLayout(
+        sidebarPanel(
+          selectizeInput("unemp_country",
+            "Select countries or regions:",
+            choices = sort(unique(unemployment$Entity)),
+            multiple = TRUE,
+            selected = c("United States", "France", "South Africa")
+          ),
+sliderInput(
+            "unemp_year",
+            "Year Range:",
+            min = min(unemp_years),
+            max = max(unemp_years),
+            value = c(min(unemp_years), max(unemp_years)),
+            step = 1,
+            sep = "" ),
+          p("Interactive comparison of unemployment trends over time.")
+        ),
+   mainPanel(  h3("Unemployment rate over time"),
+          plotlyOutput("unemp_plot", height = "450px")
+        )
+      )
+    )
+  )
+)
+server <- function(input, output, session) {
+  map_data <- reactive({
+    world |>
+    left_join(
+    education |>
+    filter(Year == input$map_year),
+    by = c("name" = "country")
+      )
+  })
+  output$mymap <- renderPlotly({
+df <- map_data()
+ map <- ggplot() +
+      geom_sf(
+        data = df |> filter(is.na(edu_share)),
+        aes(geometry = geometry, text = paste0( name, "<br>", input$map_year, "<br>", "% of government expenditure<br>","No data")
+           ),
+        fill = "white",
+        color = "grey80",
+        size = 0.1
+      ) +
+      geom_sf(
+        data = df |> filter(!is.na(edu_share)),
+        aes( geometry = geometry, fill = edu_share, text = paste0(name, "<br>",input$map_year, "<br>","% of government expenditure<br>", sprintf('%.1f%%', edu_share)
+          )
+        ),
+        color = "white",
+        size = 0.1
+      ) +
+      scale_fill_stepsn(
+        colors = my_colors,
+        breaks = my_cutpoints,
+        limits = c(0, 30),
+        guide = "none"
+      ) +
+      coord_sf(xlim = c(-170, 190), ylim = c(-55, 85), expand = FALSE) +
+      theme_minimal() +
+      theme(
+        panel.grid = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank()
+      )
+    ggplotly(map, tooltip = "text") |>
+      layout(margin = list(l = 0, r = 0, t = 0, b = 0))
+  })
+  output$unemp_plot <- renderPlotly({
+    req(input$unemp_country)
+    df <- unemployment |>
+      filter(
+        Entity %in% input$unemp_country,
+        Year >= input$unemp_year[1],
+        Year <= input$unemp_year[2]
+      )
+p <- ggplot(df, aes(x = Year, y = rate, color = Entity)) +
+      geom_line(linewidth = 1.2) +
+      geom_point(size = 1.5) +
+      theme_minimal(base_size = 14) +
+      labs(x = NULL, y = "Unemployment rate (%)") +
+      scale_y_continuous(limits = c(0, max(df$rate, na.rm = TRUE) + 2)) +
+      theme(
+        legend.position = "none",
+        panel.grid.minor = element_blank()
+      )
+  ggplotly(p, tooltip = c("Entity", "Year", "rate"))
+  })
+}
+shinyApp(ui, server)
+
+```
+
