@@ -4,56 +4,128 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Portfolio | Dan Kalenga</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
 </head>
-<body>
-<nav class="navbar navbar-dark bg-dark p-3">
-  <div class="container">
-    <span class="navbar-brand">Dan Kalenga</span>
-    <div>
-      <a href="index.html" class="text-white me-3">Home</a>
-      <a href="resume.html" class="text-white me-3">Resume</a>
-      <a href="portfolio.html" class="text-white">Portfolio</a>
-    </div>
-  </div>
-</nav>
-
-<div class="container my-5">
-  <h1 class="text-center mb-4">Portfolio</h1>
-
-  <div class="row g-4">
-
-    <div class="col-md-4">
-      <div class="card">
-        <img src="project1.png" class="card-img-top">
-        <div class="card-body">
-          <h3>Airbnb Dashboard</h3>
-          <p>This project shows Airbnb data analysis using dashboards and visualizations.</p>
-        </div>
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-dark py-3" aria-label="Main navigation">
+    <div class="container gap-2">
+      <a class="navbar-brand" href="index.html">Dan Kalenga</a>
+      <div class="d-flex flex-wrap gap-3">
+        <a class="text-white" href="index.html">Home</a>
+        <a class="text-white" href="resume.html">Résumé</a>
+        <a class="text-white" href="portfolio.html" aria-current="page">Portfolio</a>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card">
-        <img src="project2.png" class="card-img-top">
-        <div class="card-body">
-          <h3>R Map Project</h3>
-          <p>This project uses R to visualize geographic data and explore global trends.</p>
+  </nav>
+
+  <main class="container py-5">
+    <header class="mb-4">
+      <h1>Dan Kalenga’s Portfolio</h1>
+      <nav class="d-flex flex-wrap gap-3" aria-label="Portfolio sections">
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="https://www.linkedin.com/in/dan-kalenga-406609339/">LinkedIn</a>
+      </nav>
+    </header>
+
+    <section id="projects" class="mb-5">
+      <h2 class="mb-3">Projects</h2>
+
+      <article class="card mb-4">
+        <div class="card-body p-4">
+          <h3 class="h4">Deadlock Build Calculator</h3>
+          <p class="text-secondary">
+            Senior Software Engineering Capstone · Team project · In progress
+          </p>
+          <p>
+            In Deadlock, players buy items to change how their hero performs.
+            Comparing builds can be difficult because changing one item can
+            affect several stats at once.
+          </p>
+          <p>
+            My team is building a calculator that lets players choose a hero,
+            add or remove items, and see how those choices change the hero’s
+            stats. For example, a player could swap a damage item for a defensive
+            item and compare how the two builds affect damage and survivability
+            before trying either build in the game.
+          </p>
+          <p class="mb-0">
+            <strong>My contribution</strong><br>
+            [Describe one part of the capstone you personally worked on.]
+          </p>
+        </div>
+      </article>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <article class="card h-100">
+            <div class="card-body p-4">
+              <h3 class="h5">Hotel Booking &amp; Billing System</h3>
+              <p class="text-secondary">
+                Python, PostgreSQL, SQL · [Project type] · In progress
+              </p>
+              <p class="mb-0">
+                I built a Python app that checks room capacity, calculates
+                booking charges, and prints itemized receipts. I also designed
+                a PostgreSQL database and a SQL report for daily bookings,
+                guest counts, and revenue.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <div class="col-md-6">
+          <article class="card h-100">
+            <div class="card-body p-4">
+              <h3 class="h5">NYC Airbnb Market Analysis</h3>
+              <p class="text-secondary">
+                Excel, Tableau · [Project type] · In progress
+              </p>
+              <p class="mb-0">
+                I built an interactive dashboard using 2019 Airbnb data to
+                compare nightly prices and availability by borough and room type.
+                I also mapped listings across New York City’s five boroughs
+                to show where they were concentrated.
+              </p>
+            </div>
+          </article>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="col-md-4">
-      <div class="card">
-        <img src="project3.png" class="card-img-top">
-        <div class="card-body">
-          <h3>SQL Certificate</h3>
-          <p>This certificate shows my training in SQL for data science.</p>
+    <section id="experience">
+      <h2 class="mb-3">Experience</h2>
+
+      <article class="card">
+        <div class="card-body p-4">
+          <div class="row g-4 align-items-center">
+            <div class="col-md-5">
+              <img
+                src="99bridges-photo.jpg"
+                class="img-fluid rounded"
+                alt="Photo from the 99Bridges BARA outreach internship"
+                loading="lazy"
+              >
+            </div>
+
+            <div class="col-md-7">
+              <h3 class="h5">Business Outreach Ambassador | 99Bridges Inc.</h3>
+              <p class="text-secondary">Internship · July 6 – August 28, 2026</p>
+              <p class="mb-0">
+                I visited Seattle businesses to introduce the BARA reusable
+                container pilot, answer questions, and share program materials.
+                I planned outreach routes and logged each visit, the business’s
+                interest, and the next steps in a shared spreadsheet so our team
+                could follow up.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-
-  </div>
-</div>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
